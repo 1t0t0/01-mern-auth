@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js'; 
+import transporter from '../config/nodemailer.js';
 
 
 //register-section
@@ -35,6 +36,17 @@ export const register = async (req, res) => {
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', // ป้องกัน cookie ถูกส่งข้ามโดเมน
             maxAge: 7 * 24 * 60 * 60 * 1000, // อายุ cookie 7 วัน
         });
+
+        //Sending welcome email
+        const mailOptions = {
+            from:process.env.SENDER_EMAIL,
+            to:email,
+            subject:"Welcome to New member 🎉",
+            text:`Welcome come to our website. Your account has been created with email id:${email}`
+        }
+        await transporter.sendMail(mailOptions)
+
+
         return res.json({ success: true});
 
         
@@ -103,3 +115,4 @@ export const logout = async(req,res) =>{
         return res.json({success:false,message:error.message})
     }
 }
+
